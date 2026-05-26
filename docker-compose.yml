@@ -1,0 +1,51 @@
+# 1. ESPECIFICACIÓN DE LA VERSIÓN
+# Define la versión del formato de Docker Compose. La versión 3.8 es el estándar estable y robusto.
+version: "3.8"
+
+# 2. BLOQUE DE SERVICIOS (SERVIVCES)
+# Aquí se definen todos los contenedores que se van a levantar. En este caso, solo necesitamos uno.
+services:
+
+  # Nombre interno del servicio dentro de nuestra red de Docker
+  n8n-local:
+    # La "imagen" es el molde preconstruido que Docker descarga de la nube (Docker Hub).
+    # Usamos la versión oficial y la etiqueta "latest" para tener siempre las últimas herramientas.
+    image: n8nio/n8n:latest
+    
+    # Nombre que tendrá el contenedor en tu máquina cuando se esté ejecutando.
+    container_name: n8n_pruebas_estudiante
+    
+    # Política de reinicio: Si el contenedor se cae por un error interno, Docker lo reiniciará automáticamente.
+    restart: unless-stopped
+
+    # 3. PUERTOS (PORTS)
+    # Mapeo de puertos: "Puerto_Físico_Tu_PC : Puerto_Interno_Contenedor"
+    # n8n corre internamente en el puerto 5678. Al mapearlo igual, podrás acceder desde tu navegador
+    # escribiendo simplemente: http://localhost:5678
+    ports:
+      - "5678:5678"
+
+    # 4. VARIABLES DE ENTORNO (ENVIRONMENT)
+    # Configuran el comportamiento interno de n8n antes de que arranque.
+    environment:
+      # Define la zona horaria del contenedor para que las automatizaciones programadas (cron)
+      # se ejecuten exactamente a la hora de tu país (América/Guatemala).
+      - GENERIC_TIMEZONE=America/Guatemala
+      - TZ=America/Guatemala
+      
+      # Indica a n8n qué formato de hora visualizaremos en la interfaz de usuario (24 horas).
+      - EXECUTIONS_DATA_PRUNE=true # Limpia ejecuciones antiguas automáticamente para no llenar tu disco.
+      - EXECUTIONS_DATA_MAX_AGE=168 # Mantiene el historial de pruebas solo por 7 días (168 horas).
+
+    # 5. VOLÚMENES (VOLUMES)
+    # ¡Crucial para persistencia! Por defecto, si apagas un contenedor Docker, todo lo que hiciste se borra.
+    # Los volúmenes crean un "túnel" entre una carpeta de tu PC y una carpeta dentro del contenedor.
+    # "nombre_volumen : ruta_dentro_del_contenedor"
+    volumes:
+      - n8n_data_local:/home/node/.n8n
+
+# 6. DEFINICIÓN DEL VOLUMEN
+# Aquí le avisamos formalmente a Docker Compose que debe crear y gestionar el volumen que usamos arriba.
+# Docker se encargará de guardar tus flujos y credenciales de forma segura en tu disco duro.
+volumes:
+  n8n_data_local:
