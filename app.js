@@ -3,7 +3,7 @@ document.getElementById('inasistencia-form').addEventListener('submit', async (e
 
     const form = event.target;
     const submitButton = form.querySelector('.btn-submit');
-    const webhookUrl = 'http://localhost:5678/webhook-test/justificacion-inasistencia';
+    const webhookUrl = 'http://localhost:5678/webhook-test/justificacion';
 
     // Bloquear el botón para evitar envíos duplicados mientras procesa n8n
     submitButton.disabled = true;
